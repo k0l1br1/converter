@@ -1,4 +1,4 @@
-# loader
+# converter
 A tool for converting candles to bins
 ```
 usage: converter -s <symbol> [options]
