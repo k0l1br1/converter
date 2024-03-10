@@ -1,6 +1,5 @@
 # loader
-A tool to load and store candlestick data 
-
+A tool for converting candles to bins
 ```
 usage: converter -s <symbol> [options]
     -s, --symbol    The pair candles to convert to bins
