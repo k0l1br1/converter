@@ -6,7 +6,7 @@ type NBin struct {
 	Volume float32
 }
 
-func Normilize(bs []Bin, nbs []NBin) {
+func Normalize(bs []Bin, nbs []NBin) {
 	if len(bs) != len(nbs) {
 		panic("invalid bins lenght")
 	}

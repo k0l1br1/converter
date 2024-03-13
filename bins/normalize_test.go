@@ -10,7 +10,7 @@ func TestNormalization(t *testing.T) {
 	wantNBins := []NBin{{true, 0.5, 0.125}, {false, 1, 0.25}, {true, 0.5, 1}}
 
 	nBins := make([]NBin, len(bins))
-	Normilize(bins, nBins)
+	Normalize(bins, nBins)
 
 	if !reflect.DeepEqual(nBins, wantNBins) {
 		t.Fatalf("invalid normalize result: want %v, got %v", wantNBins, nBins)
