@@ -8,10 +8,11 @@ const (
 	testCheckFile = "/tmp/test-checkpoint.json"
 	step          = 10
 	price         = 100
+	time          = 0
 )
 
 func TestCheckpointAlgo(t *testing.T) {
-	check := NewCheckpoint(price, step)
+	check := NewCheckpoint(price, step, time)
 	var wantNextUp float32 = 110
 	var wantNextDown float32 = 90
 	if check.NextUp != wantNextUp {
@@ -41,7 +42,7 @@ func TestCheckpointAlgo(t *testing.T) {
 }
 
 func TestCheckpoint(t *testing.T) {
-	check := NewCheckpoint(price, step)
+	check := NewCheckpoint(price, step, time)
 	check.LastTime = 1
 
 	err := check.Save(testCheckFile)
