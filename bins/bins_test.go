@@ -48,3 +48,19 @@ func TestBinsAppend(t *testing.T) {
 		t.Fatalf("invalid read appended result: want %v, got %v", bs1, bs2)
 	}
 }
+
+func TestBinsReadLastN(t *testing.T) {
+    if err := Write(testBinsFile, bins[:]); err != nil {
+		t.Fatal("append to bins file", err)
+	}
+
+	bs2, err := ReadLastN(testBinsFile, 2)
+	if err != nil {
+		t.Fatal("read from bins file", err)
+	}
+
+    bs1 := bins[1:]
+	if !reflect.DeepEqual(bs1, bs2) {
+		t.Fatalf("invalid read last n result: want %v, got %v", bs1, bs2)
+	}
+}

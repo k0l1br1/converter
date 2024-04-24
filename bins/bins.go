@@ -3,6 +3,7 @@ package bins
 import (
 	"encoding/binary"
 	"errors"
+	"io"
 	"math"
 	"os"
 	"path/filepath"
@@ -72,23 +73,54 @@ func WriteDefault(symbol string, b []Bin) error {
 }
 
 func ReadAll(path string) ([]Bin, error) {
-	bs, err := os.ReadFile(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	if len(bs)%BinByteSize != 0 {
+	if len(b)%BinByteSize != 0 {
 		return nil, errors.New("corrupted bins file")
 	}
-	b := make([]Bin, int(len(bs)/BinByteSize))
-	n := len(b)
+	return bytes2bins(b), nil
+}
+
+func bytes2bins(bs []byte) []Bin {
+	bins := make([]Bin, int(len(bs)/BinByteSize))
+	n := len(bins)
 	var off int
 	for i := 0; i < n; i++ {
 		off = i * BinByteSize
-		b[i].IsUp = bs[off]
-		b[i].Time = binary.LittleEndian.Uint32(bs[1+off : 5+off])
-		b[i].Volume = math.Float32frombits(binary.LittleEndian.Uint32(bs[5+off : 9+off]))
+		bins[i].IsUp = bs[off]
+		bins[i].Time = binary.LittleEndian.Uint32(bs[1+off : 5+off])
+		bins[i].Volume = math.Float32frombits(binary.LittleEndian.Uint32(bs[5+off : 9+off]))
 	}
-	return b, nil
+	return bins
+}
+
+func ReadLastN(path string, n int) ([]Bin, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, errorWrap("open bins file", err)
+	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil {
+		return nil, errorWrap("read bins file stat", err)
+	}
+	size := fi.Size()
+	if size == 0 || n < 1 {
+		return make([]Bin, 0), nil
+	}
+	at := size - int64(n*BinByteSize)
+	if at < 0 {
+		at = 0
+	}
+	buf := make([]byte, size-at)
+	_, err = f.ReadAt(buf, at)
+	if err != nil && err != io.EOF {
+		return make([]Bin, 0), errorWrap("read bins file", err)
+	}
+	return bytes2bins(buf), nil
 }
 
 func ReadAllDefault(symbol string) ([]Bin, error) {
